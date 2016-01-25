@@ -20,6 +20,10 @@ void SoftwareRendererImp::draw_svg( SVG& svg ) {
   transformation = canvas_to_screen;
 
   // draw all elements
+  /* 
+   accepts an SVG file, and draws all elements in the SVG file via 
+   a sequence of calls to draw_element().
+  */
   for ( size_t i = 0; i < svg.elements.size(); ++i ) {
     draw_element(svg.elements[i]);
   }
@@ -40,6 +44,9 @@ void SoftwareRendererImp::draw_svg( SVG& svg ) {
 
 }
 
+// buffer "render target": 
+// the values in this buffer are values that will be displayed on screen.
+// be called whenever the user resizes the application window.
 void SoftwareRendererImp::set_sample_rate( size_t sample_rate ) {
 
   // Task 3: 
@@ -47,6 +54,7 @@ void SoftwareRendererImp::set_sample_rate( size_t sample_rate ) {
   this->sample_rate = sample_rate;
 
 }
+
 
 void SoftwareRendererImp::set_render_target( unsigned char* render_target,
                                              size_t width, size_t height ) {
@@ -59,6 +67,9 @@ void SoftwareRendererImp::set_render_target( unsigned char* render_target,
 
 }
 
+/*
+ inspects the type of the element, calls the appropriate draw function.
+*/
 void SoftwareRendererImp::draw_element( SVGElement* element ) {
 
   // Task 4 (part 1):
@@ -100,8 +111,8 @@ void SoftwareRendererImp::draw_element( SVGElement* element ) {
 
 void SoftwareRendererImp::draw_point( Point& point ) {
 
-  Vector2D p = transform(point.position);
-  rasterize_point( p.x, p.y, point.style.fillColor );
+  Vector2D p = transform(point.position); //transform the input into its screen-space position
+  rasterize_point( p.x, p.y, point.style.fillColor ); //actually drawing the point
 
 }
 
@@ -222,7 +233,7 @@ void SoftwareRendererImp::draw_group( Group& group ) {
 
 void SoftwareRendererImp::rasterize_point( float x, float y, Color color ) {
 
-  // fill in the nearest pixel
+  //fill in the nearest pixel
   int sx = (int) floor(x);
   int sy = (int) floor(y);
 
@@ -241,9 +252,54 @@ void SoftwareRendererImp::rasterize_point( float x, float y, Color color ) {
 void SoftwareRendererImp::rasterize_line( float x0, float y0,
                                           float x1, float y1,
                                           Color color) {
-
   // Task 1: 
   // Implement line rasterization
+
+
+  bool steep = abs(y1-y0) > abs(x1-x0);
+  
+  if(steep){ // reflected by y=x, swap x and y
+    // return;
+    swap(x0,y0);
+    swap(x1,y1);
+  }
+  if(x0>x1){ // if line start from top-right to bottom left, swap starting point and end point
+    // return;
+    swap(x0,x1);
+    swap(y0,y1);
+  }
+
+  float dx = x1-x0;
+  float dy = abs(y1-y0);
+  float err = 0;
+  float derr = dy/dx;
+  int ystep;
+
+
+  if(y1<y0){ // determines the increasing direction of y
+    ystep = -1;
+  }
+  else {
+    ystep = 1;
+  }
+
+  for(int x = x0,y = y0;x<x1;x++){
+    if(steep){
+      rasterize_point(y,x,color);
+    }
+    else{
+      rasterize_point(x,y,color);
+    }
+    err += derr;
+    if(err>=0.5){
+      y+=ystep;
+      err-=1.0;
+    }
+
+  }
+
+
+
 }
 
 void SoftwareRendererImp::rasterize_triangle( float x0, float y0,
@@ -273,5 +329,13 @@ void SoftwareRendererImp::resolve( void ) {
 
 }
 
+//functions
+void swap(float *a, float *b){
+  float temp;
+  temp = *a;
+  *a = *b;
+  *b = temp;
+}
 
 } // namespace CMU462
+
