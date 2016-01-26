@@ -351,11 +351,7 @@ void SoftwareRendererImp::rasterize_triangle( float x0, float y0,
   float maxX;
   float maxY;
 
-  int x,y,i;
-
-  rasterize_line(x0,y0,x1,y1,color);
-  rasterize_line(x1,y1,x2,y2,color);
-  rasterize_line(x2,y2,x0,y0,color);
+  int x,y;
 
   minX = tripleMin(x0,x1,x2);
   minY = tripleMin(y0,y1,y2);
@@ -363,25 +359,10 @@ void SoftwareRendererImp::rasterize_triangle( float x0, float y0,
   maxX = tripleMax(x0,x1,x2);
   maxY = tripleMax(y0,y1,y2);
   
-  // int dx[5] = {1,2,3,4,5};
-
-  float dx[3] = {x1-x0,x2-x1,x0-x2};
-  float dy[3] = {y1-y0,y2-y1,y0-y2};
-  float c[3] = {dx[0]*y0-dy[0]*x0,dx[1]*y1-dy[1]*x1,dx[2]*y2-dy[2]*x2};
-
-  float e;
 
   for(x = minX;x<maxX;x++){
     for(y = minY;y<maxY;y++){
-      for(i = 0;i<3;i++){
-        e = dy[i] * (float)x -dx[i] * (float)y + c[i];
-        if(e>0){
-          break;
-        }
-      } 
-      if(i>=3){
-        rasterize_point(x,y,color);
-      }
+      rasterize_point(x,y,color);
     }
   }
 
