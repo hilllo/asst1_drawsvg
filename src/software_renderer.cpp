@@ -255,7 +255,44 @@ void SoftwareRendererImp::rasterize_line( float x0, float y0,
   // Task 1: 
   // Implement line rasterization
 
+  // linear equation solution
+  // bool steep = abs(y1-y0)>abs(x1-x0);
+  // if(steep){ // reflected by y=x, swap x and y
+  //   swap(x0,y0);
+  //   swap(x1,y1);
+  // }
 
+  // double dx = x1-x0;
+  // double dy = y1-y0;
+  // double k = dy / dx;
+  // double temp;
+
+  // if(x1>x0){
+  //     for(int x = x0,y = y0;x<x1;x++){ 
+  //     temp = k*((double) x -x0)+y0;
+  //     y = temp;
+  //     if(steep){
+  //       rasterize_point(y,x,color);
+  //     }
+  //     else{
+  //       rasterize_point(x,y,color);
+  //     }
+  //   }
+  // }
+  // else{
+  //     for(int x = x0,y = y0;x>x1;x--){ 
+  //     temp = k*((double) x -x0)+y0;
+  //     y = temp;
+  //     if(steep){
+  //       rasterize_point(y,x,color);
+  //     }
+  //     else{
+  //       rasterize_point(x,y,color);
+  //     }
+  //   }
+  // }
+    
+  // Bersenham algorithm solution
   bool steep = abs(y1-y0) > abs(x1-x0);
   
   if(steep){ // reflected by y=x, swap x and y
@@ -297,8 +334,6 @@ void SoftwareRendererImp::rasterize_line( float x0, float y0,
     }
 
   }
-
-
 
 }
 
