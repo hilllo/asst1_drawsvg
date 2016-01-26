@@ -11,6 +11,8 @@ using namespace std;
 
 namespace CMU462 {
 
+float tripleMin(float a, float b, float c);
+float tripleMax(float a, float b, float c);
 
 // Implements SoftwareRenderer //
 
@@ -344,6 +346,26 @@ void SoftwareRendererImp::rasterize_triangle( float x0, float y0,
   // Task 2: 
   // Implement triangle rasterization
 
+  float minX;
+  float minY;
+  float maxX;
+  float maxY;
+
+  int x,y;
+
+  minX = tripleMin(x0,x1,x2);
+  minY = tripleMin(y0,y1,y2);
+
+  maxX = tripleMax(x0,x1,x2);
+  maxY = tripleMax(y0,y1,y2);
+  
+
+  for(x = minX;x<maxX;x++){
+    for(y = minY;y<maxY;y++){
+      rasterize_point(x,y,color);
+    }
+  }
+
 }
 
 void SoftwareRendererImp::rasterize_image( float x0, float y0,
@@ -371,6 +393,28 @@ void swap(float *a, float *b){
   *a = *b;
   *b = temp;
 }
+
+float tripleMin(float a, float b, float c){
+  if(b<a){
+    a = b;
+  }
+  if(c<a){
+    a = c;
+  }
+  return a;
+}
+
+float tripleMax(float a, float b, float c){
+  if(b>a){
+    a = b;
+  }
+  if(c>a){
+    a = c;
+  }
+  return a;
+}
+
+
 
 } // namespace CMU462
 
