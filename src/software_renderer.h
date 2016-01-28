@@ -10,6 +10,9 @@
 
 namespace CMU462 { // CMU462
 
+float tripleMin(float a, float b, float c);
+float tripleMax(float a, float b, float c);
+
 class SoftwareRenderer : public SVGRenderer {
  public:
 
@@ -120,6 +123,20 @@ class SoftwareRendererImp : public SoftwareRenderer {
                        Color color);
 
   // rasterize a triangle
+  void top_triangle( float x0, float y0,
+                    float x1, float y1,
+                    float x2, float y2,
+                    Color color );
+
+  void bottom_triangle(  float x0, float y0,
+                        float x1, float y1,
+                        float x2, float y2,
+                        Color color );
+  
+  // void point_compare(float ax,float ay,
+  //                     float bx,float by, 
+  //                     float centerx,float centery);
+
   void rasterize_triangle( float x0, float y0,
                            float x1, float y1,
                            float x2, float y2,
@@ -132,6 +149,9 @@ class SoftwareRendererImp : public SoftwareRenderer {
 
   // resolve samples to render target
   void resolve( void );
+
+  // Supersample render target memory location
+  unsigned char* supersample_target; 
 
 }; // class SoftwareRendererImp
 

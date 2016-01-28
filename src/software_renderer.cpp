@@ -11,8 +11,7 @@ using namespace std;
 
 namespace CMU462 {
 
-float tripleMin(float a, float b, float c);
-float tripleMax(float a, float b, float c);
+
 
 // Implements SoftwareRenderer //
 
@@ -26,9 +25,12 @@ void SoftwareRendererImp::draw_svg( SVG& svg ) {
    accepts an SVG file, and draws all elements in the SVG file via 
    a sequence of calls to draw_element().
   */
-  for ( size_t i = 0; i < svg.elements.size(); ++i ) {
+  for ( size_t i = 0; i < svg.elements.size(); ++i ) { 
     draw_element(svg.elements[i]);
+    
   }
+
+  transformation = canvas_to_screen;
 
   // draw canvas outline
   Vector2D a = transform(Vector2D(    0    ,     0    )); a.x--; a.y++;
@@ -53,6 +55,9 @@ void SoftwareRendererImp::set_sample_rate( size_t sample_rate ) {
 
   // Task 3: 
   // You may want to modify this for supersampling support
+
+  // set_render_target()
+
   this->sample_rate = sample_rate;
 
 }
@@ -63,6 +68,14 @@ void SoftwareRendererImp::set_render_target( unsigned char* render_target,
 
   // Task 3: 
   // You may want to modify this for supersampling support
+
+  // this->supersample_target = (unsigned char*)malloc(4*sample_rate*sample_rate*width*height);
+
+
+
+
+  // free(supersample_target);
+
   this->render_target = render_target;
   this->target_w = width;
   this->target_h = height;
@@ -74,8 +87,7 @@ void SoftwareRendererImp::set_render_target( unsigned char* render_target,
 */
 void SoftwareRendererImp::draw_element( SVGElement* element ) {
 
-  // Task 4 (part 1):
-  // Modify this to implement the transformation stack
+  transformation = transformation * element->transform;
 
   switch(element->type) {
     case POINT:
@@ -87,6 +99,7 @@ void SoftwareRendererImp::draw_element( SVGElement* element ) {
     case POLYLINE:
       draw_polyline(static_cast<Polyline&>(*element));
       break;
+      // break;
     case RECT:
       draw_rect(static_cast<Rect&>(*element));
       break;
@@ -105,6 +118,8 @@ void SoftwareRendererImp::draw_element( SVGElement* element ) {
     default:
       break;
   }
+  
+  transformation = transformation * element->transform.inv();
 
 }
 
@@ -324,10 +339,16 @@ void SoftwareRendererImp::rasterize_line( float x0, float y0,
 
   for(int x = x0,y = y0;x<x1;x++){
     if(steep){
-      rasterize_point(y,x,color);
+      render_target[4 * (y + x * target_w)    ] = (uint8_t) (color.r * 255);
+      render_target[4 * (y + x * target_w) + 1] = (uint8_t) (color.g * 255);
+      render_target[4 * (y + x * target_w) + 2] = (uint8_t) (color.b * 255);
+      render_target[4 * (y + x * target_w) + 3] = (uint8_t) (color.a * 255);
     }
     else{
-      rasterize_point(x,y,color);
+      render_target[4 * (x + y * target_w)    ] = (uint8_t) (color.r * 255);
+      render_target[4 * (x + y * target_w) + 1] = (uint8_t) (color.g * 255);
+      render_target[4 * (x + y * target_w) + 2] = (uint8_t) (color.b * 255);
+      render_target[4 * (x + y * target_w) + 3] = (uint8_t) (color.a * 255);
     }
     err += derr;
     if(err>=0.5){
@@ -337,7 +358,146 @@ void SoftwareRendererImp::rasterize_line( float x0, float y0,
 
   }
 
+  // TBD: Xiaolin Wu's method
+
+
 }
+
+void SoftwareRendererImp::top_triangle(  float x0, float y0,
+                                        float x1, float y1,
+                                        float x2, float y2,
+                                        Color color ){
+  // if(y2==y1){
+
+  // }
+  // else if(y0==y2){
+  //   swap(x1,x1);
+  //   swap(y2,y1);
+  // }
+  // else if(y1==y2){
+  //   swap(x0,x1);
+  //   swap(y0,y1);
+  // }
+  // else{
+  //   cout<< "This is not a top triangle!"<<endl;
+  //   return;
+  // }
+
+  float temp;
+  if(x1<x0){
+    temp = x1;
+    x1 = x0;
+    x0 = temp;
+    temp = y1;
+    y1 = y0;
+    y0 = temp;
+    // swap(y1,y0);
+  }
+
+
+
+  float d_left;
+  if((int)y2-(int)y0 ==0){
+    d_left = 0;
+  }
+  else{
+    d_left = (x2 - x0)/(y2-y0);
+  }
+    
+  float d_right;
+  if((int)y1-(int)y2 ==0){
+    d_right = 0;
+  }
+  else{
+    d_right = (x2-x1)/(y2-y1);
+  }
+  cout<< "A top triangle:"<<endl;
+  cout<<"("<<x0<<", "<<y0<<") ";
+  cout<<"("<<x1<<", "<<y1<<") ";
+  cout<<"("<<x2<<", "<<y2<<") "<<endl;
+  cout<<"d_left = "<<d_left<<"d_right = "<<d_right<<endl;
+
+  float xs = x0, xe = x1 ;
+  for(int y = y0;y<y2;y++){
+    // cout<<"xs = "<<xs<<" ,xe = "<<xe<<" ,y = "<<y<<endl;
+    rasterize_line(xs,y,xe,y,color);
+    xs += d_left;
+    xe += d_right;
+    cout<<"after adding:"<<endl;
+    cout<<"xs = "<<xs<<" ,xe = "<<xe<<" ,y = "<<y<<endl;
+  }
+
+}
+
+
+  void SoftwareRendererImp::bottom_triangle(  float x0, float y0,
+                                            float x1, float y1,
+                                            float x2, float y2,
+                                            Color color ){
+    // if(y2==y1){
+
+    // }
+    // else if(y2==y0){
+    //   swap(x0,x1);
+    //   swap(y0,y1);
+    // }
+    // else if(y0==y1){
+    //   swap(x0,x2);
+    //   swap(y0,y2);
+    // }
+    // else{
+    // cout<< "This is not a bottom triangle!"<<endl;
+    // return;      
+    // }  
+
+    float temp;
+    if(x1<x2){
+      temp = x1;
+      x1 = x2;
+      x2 = temp;
+      temp = y1;
+      y1 = y2;
+      y2 = temp;
+    }
+
+    float d_left;
+    if((int)y2-(int)y0 ==0){
+      d_left = 0;
+    }
+    else{
+      d_left =(x2-x0)/(y2-y0);
+    }
+
+    float d_right;
+    if((int)y1-(int)y0 ==0){
+      d_right = 0;
+    } 
+    else{
+      d_right = (x1-x0)/(y1-y0);
+    }
+    
+
+    cout<< "A bottom triangle:"<<endl;
+    cout<<"("<<x0<<", "<<y0<<") ";
+    cout<<"("<<x1<<", "<<y1<<") ";
+    cout<<"("<<x2<<", "<<y2<<") "<<endl;
+    cout<<"d_left = "<<d_left<<" ,d_right = "<<d_right<<endl;
+
+    float xs = x0, xe = x0 ;
+
+    for(int y = y0;y<=y2;y++){
+      rasterize_line(xs,y,xe,y,color);
+
+      xs += d_left;
+      xe += d_right;
+      cout<<"after adding:"<<endl;
+      cout<<"xs = "<<xs<<" ,xe = "<<xe<<" ,y = "<<y<<endl;  
+  }
+
+}
+
+
+
 
 void SoftwareRendererImp::rasterize_triangle( float x0, float y0,
                                               float x1, float y1,
@@ -345,6 +505,90 @@ void SoftwareRendererImp::rasterize_triangle( float x0, float y0,
                                               Color color ) {
   // Task 2: 
   // Implement triangle rasterization
+  if((x0==x1&&x1==x2)||(y0==y1&&y1==y2)){
+    std::cout<< "This is not a triangle!"<<endl;
+    return;
+  }
+
+  // if(y0>y1){
+  //   swap(x0,x1);
+  //   swap(y0,y1);
+  // }
+  // if(y0>y2){
+  //   swap(x0,x2);
+  //   swap(y0,y2);
+  // }
+  // if(y1>y2){
+  //   swap(x1,x2);
+  //   swap(y1,y2);
+  // }
+    // cout<<"("<<x0<<", "<<y0<<") ";
+    // cout<<"("<<x1<<", "<<y1<<") ";
+    // cout<<"("<<x2<<", "<<y2<<") "<<endl;
+
+  // if(y0==y1){
+  //   top_triangle(x0,y0,x1,y1,x2,y2,color);
+  // }
+  // else if(y1 == y2){
+  //   bottom_triangle(x0,y0,x1,y1,x2,y2,color);
+  // }
+  // else{
+  //   float nx;
+  //   if((int)y2-(int)y0==0){
+  //     nx = x0;
+  //   }
+  //   else{
+  //     nx = x0+(y1-y0)*(x2-x0)/(y2-y0);
+  //   }
+  //   cout<<"new x:"<<"("<<nx<<", "<<y1<<") "<<endl;
+  //   top_triangle(nx,y1,x1,y1,x2,y2,color);
+  //   bottom_triangle(x0,y0,nx,y1,x1,y1,color);
+  // }
+
+
+  // Rectangle Method
+  // CCW triangle
+  // Step 1: choose the toppest point as (x0,y0)
+  if(y0>y1){
+    swap(x0,x1);
+    swap(y0,y1);
+  }
+  if(y0>y2){
+    swap(x0,x2);
+    swap(y0,y2);
+  }
+
+  // Step 2: draw a line between (x0,y0) and (x2,y2)
+  float dxtemp = x0-x2;
+  float dytemp = y0-y2;
+    // judge whether (x1,x2) should switch with (x2,y2)
+  if(dxtemp == 0){
+    if(x1<x2){
+      swap(x1,x2);
+      swap(y1,y2);
+    }
+  }
+  else{ 
+    float dtemp = dytemp / dxtemp;
+    if(dxtemp<0){
+      if(y1>dtemp*(x1-x0)+y0){
+        swap(x1,x2);
+        swap(y1,y2);
+      }
+    }
+    else if(dxtemp>0){
+      if(y1<dtemp*(x1-x0)+y0){
+        swap(x1,x2);
+        swap(y1,y2);
+      }
+    }
+  }
+
+
+  // cout<<"Rectangle:"<<endl;
+  // cout<<"("<<x0<<", "<<y0<<") ";
+  // cout<<"("<<x1<<", "<<y1<<") ";
+  // cout<<"("<<x2<<", "<<y2<<") "<<endl;
 
   float minX;
   float minY;
@@ -353,9 +597,9 @@ void SoftwareRendererImp::rasterize_triangle( float x0, float y0,
 
   int x,y,i;
 
-  rasterize_line(x0,y0,x1,y1,color);
-  rasterize_line(x1,y1,x2,y2,color);
-  rasterize_line(x2,y2,x0,y0,color);
+  // rasterize_line(x0,y0,x1,y1,color);
+  // rasterize_line(x1,y1,x2,y2,color);
+  // rasterize_line(x2,y2,x0,y0,color);
 
   minX = tripleMin(x0,x1,x2);
   minY = tripleMin(y0,y1,y2);
@@ -363,11 +607,11 @@ void SoftwareRendererImp::rasterize_triangle( float x0, float y0,
   maxX = tripleMax(x0,x1,x2);
   maxY = tripleMax(y0,y1,y2);
   
-  // int dx[5] = {1,2,3,4,5};
 
   float dx[3] = {x1-x0,x2-x1,x0-x2};
   float dy[3] = {y1-y0,y2-y1,y0-y2};
   float c[3] = {dx[0]*y0-dy[0]*x0,dx[1]*y1-dy[1]*x1,dx[2]*y2-dy[2]*x2};
+  
 
   float e;
 
@@ -375,15 +619,23 @@ void SoftwareRendererImp::rasterize_triangle( float x0, float y0,
     for(y = minY;y<maxY;y++){
       for(i = 0;i<3;i++){
         e = dy[i] * (float)x -dx[i] * (float)y + c[i];
+        // cout<<"e = "<<e<<endl;
         if(e>0){
           break;
         }
       } 
       if(i>=3){
-        rasterize_point(x,y,color);
+        render_target[4 * (x + y * target_w)    ] = (uint8_t) (color.r * 255);
+        render_target[4 * (x + y * target_w) + 1] = (uint8_t) (color.g * 255);
+        render_target[4 * (x + y * target_w) + 2] = (uint8_t) (color.b * 255);
+        render_target[4 * (x + y * target_w) + 3] = (uint8_t) (color.a * 255);
       }
     }
+
+
   }
+
+  // TBD:faster and anti-alias
 
 }
 
@@ -401,17 +653,22 @@ void SoftwareRendererImp::resolve( void ) {
   // Task 3: 
   // Implement supersampling
   // You may also need to modify other functions marked with "Task 3".
+
+  
+
+
   return;
 
 }
 
 //functions
-void swap(float *a, float *b){
+void swap(float & a, float & b){
   float temp;
-  temp = *a;
-  *a = *b;
-  *b = temp;
+  temp = a;
+  a = b;
+  b = temp;
 }
+
 
 float tripleMin(float a, float b, float c){
   if(b<a){
