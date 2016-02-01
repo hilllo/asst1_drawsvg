@@ -117,26 +117,15 @@ class SoftwareRendererImp : public SoftwareRenderer {
   // rasterize a point
   void rasterize_point( float x, float y, Color color );
 
+  float fpart(float x);
+  float rfpart(float x);
+
   // rasterize a line
   void rasterize_line( float x0, float y0,
                        float x1, float y1,
                        Color color);
 
   // rasterize a triangle
-  void top_triangle( float x0, float y0,
-                    float x1, float y1,
-                    float x2, float y2,
-                    Color color );
-
-  void bottom_triangle(  float x0, float y0,
-                        float x1, float y1,
-                        float x2, float y2,
-                        Color color );
-  
-  // void point_compare(float ax,float ay,
-  //                     float bx,float by, 
-  //                     float centerx,float centery);
-
   void rasterize_triangle( float x0, float y0,
                            float x1, float y1,
                            float x2, float y2,

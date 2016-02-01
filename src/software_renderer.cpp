@@ -258,12 +258,43 @@ void SoftwareRendererImp::rasterize_point( float x, float y, Color color ) {
   if ( sx < 0 || sx >= target_w ) return;
   if ( sy < 0 || sy >= target_h ) return;
 
-  // fill sample - NOT doing alpha blending!
-  render_target[4 * (sx + sy * target_w)    ] = (uint8_t) (color.r * 255);
-  render_target[4 * (sx + sy * target_w) + 1] = (uint8_t) (color.g * 255);
-  render_target[4 * (sx + sy * target_w) + 2] = (uint8_t) (color.b * 255);
-  render_target[4 * (sx + sy * target_w) + 3] = (uint8_t) (color.a * 255);
 
+
+  // render_target[4 * (sx + sy * target_w)    ] = (uint8_t) (color.r * 255);
+  // render_target[4 * (sx + sy * target_w) + 1] = (uint8_t) (color.g * 255);
+  // render_target[4 * (sx + sy * target_w) + 2] = (uint8_t) (color.b * 255);
+  // render_target[4 * (sx + sy * target_w) + 3] = (uint8_t) (color.a * 255);
+
+  // alpha blending
+  Color origin,target;
+
+  origin.r = render_target[4 * (sx + sy * target_w)]/255;
+  origin.g = render_target[4 * (sx + sy * target_w)+1]/255;
+  origin.b = render_target[4 * (sx + sy * target_w)+2]/255;
+  origin.a = render_target[4 * (sx + sy * target_w)+3]/255;
+
+  target.r = (1-color.a) * origin.r+color.a * color.r;
+  target.g = (1-color.a) * origin.g+color.a * color.g;
+  target.b = (1-color.a) * origin.b+color.a * color.b;
+  target.a = 1-(1-origin.a)*(1-color.a);
+
+
+  render_target[4 * (sx + sy * target_w)    ] = (uint8_t) (target.r * 255);
+  render_target[4 * (sx + sy * target_w) + 1] = (uint8_t) (target.g * 255);
+  render_target[4 * (sx + sy * target_w) + 2] = (uint8_t) (target.b * 255);
+  render_target[4 * (sx + sy * target_w) + 3] = (uint8_t) (target.a * 255);
+
+}
+
+float SoftwareRendererImp::fpart(float x){
+  if(x<0)
+    return 1.0-(x-floor(x));
+  else
+    return x-floor(x);
+}
+
+float SoftwareRendererImp::rfpart(float x){
+  return 1.0-fpart(x);
 }
 
 void SoftwareRendererImp::rasterize_line( float x0, float y0,
@@ -272,44 +303,45 @@ void SoftwareRendererImp::rasterize_line( float x0, float y0,
   // Task 1: 
   // Implement line rasterization
 
-  // linear equation solution
-  // bool steep = abs(y1-y0)>abs(x1-x0);
-  // if(steep){ // reflected by y=x, swap x and y
-  //   swap(x0,y0);
-  //   swap(x1,y1);
-  // }
+  /* linear equation solution
+    bool steep = abs(y1-y0)>abs(x1-x0);
+    if(steep){ // reflected by y=x, swap x and y
+      swap(x0,y0);
+      swap(x1,y1);
+    }
 
-  // double dx = x1-x0;
-  // double dy = y1-y0;
-  // double k = dy / dx;
-  // double temp;
+    double dx = x1-x0;
+    double dy = y1-y0;
+    double k = dy / dx;
+    double temp;
 
-  // if(x1>x0){
-  //     for(int x = x0,y = y0;x<x1;x++){ 
-  //     temp = k*((double) x -x0)+y0;
-  //     y = temp;
-  //     if(steep){
-  //       rasterize_point(y,x,color);
-  //     }
-  //     else{
-  //       rasterize_point(x,y,color);
-  //     }
-  //   }
-  // }
-  // else{
-  //     for(int x = x0,y = y0;x>x1;x--){ 
-  //     temp = k*((double) x -x0)+y0;
-  //     y = temp;
-  //     if(steep){
-  //       rasterize_point(y,x,color);
-  //     }
-  //     else{
-  //       rasterize_point(x,y,color);
-  //     }
-  //   }
-  // }
+    if(x1>x0){
+        for(int x = x0,y = y0;x<x1;x++){ 
+        temp = k*((double) x -x0)+y0;
+        y = temp;
+        if(steep){
+          rasterize_point(y,x,color);
+        }
+        else{
+          rasterize_point(x,y,color);
+        }
+      }
+    }
+    else{
+        for(int x = x0,y = y0;x>x1;x--){ 
+        temp = k*((double) x -x0)+y0;
+        y = temp;
+        if(steep){
+          rasterize_point(y,x,color);
+        }
+        else{
+          rasterize_point(x,y,color);
+        }
+      }
+    }
+  */
     
-  // Bersenham algorithm solution
+  
   bool steep = abs(y1-y0) > abs(x1-x0);
   
   if(steep){ // reflected by y=x, swap x and y
@@ -323,181 +355,100 @@ void SoftwareRendererImp::rasterize_line( float x0, float y0,
     swap(y0,y1);
   }
 
+  //Xiaolin Wu's Solution
   float dx = x1-x0;
-  float dy = abs(y1-y0);
-  float err = 0;
-  float derr = dy/dx;
-  int ystep;
+  float dy = y1-y0;
+  float gradient = dy/dx;
 
+  float xend = floor(x0+0.5);
+  float yend = y0 + gradient * (xend-x0);
+  float xgap = rfpart(x0+0.5);
+  int xpxl1 = xend;
+  int ypxl1 = floor(yend);
 
-  if(y1<y0){ // determines the increasing direction of y
-    ystep = -1;
+  if(steep){
+    color.a = rfpart(yend*xgap);
+    rasterize_point(ypxl1,xpxl1,color);
+    color.a = fpart(yend*xgap);
+    rasterize_point(ypxl1+1,xpxl1,color);
   }
-  else {
-    ystep = 1;
+  else{
+    color.a = rfpart(yend*xgap);
+    rasterize_point(xpxl1,ypxl1,color);
+    color.a = fpart(yend*xgap);
+    rasterize_point(xpxl1,ypxl1+1,color);
   }
 
-  for(int x = x0,y = y0;x<x1;x++){
+  float intery = yend + gradient;
+
+  xend = floor(x1+0.5);
+  yend = y1 + gradient * (xend-x1);
+  xgap = rfpart(x1+0.5);
+  int xpxl2 = xend;
+  int ypxl2 = floor(yend);
+
+  if(steep){
+    color.a = rfpart(yend*xgap);
+    rasterize_point(ypxl2,xpxl2,color);
+    color.a = fpart(yend*xgap);
+    rasterize_point(ypxl2+1,xpxl2,color);
+  }
+  else{
+    color.a = rfpart(yend*xgap);
+    rasterize_point(xpxl2,ypxl2,color);
+    color.a = fpart(yend*xgap);
+    rasterize_point(xpxl2,ypxl2+1,color);
+  }
+
+  for(int x = xpxl1+1;x<=xpxl2-1;x++){
     if(steep){
-      render_target[4 * (y + x * target_w)    ] = (uint8_t) (color.r * 255);
-      render_target[4 * (y + x * target_w) + 1] = (uint8_t) (color.g * 255);
-      render_target[4 * (y + x * target_w) + 2] = (uint8_t) (color.b * 255);
-      render_target[4 * (y + x * target_w) + 3] = (uint8_t) (color.a * 255);
+      color.a = rfpart(intery);
+      rasterize_point(floor(intery) , x , color);
+      color.a = fpart(intery);
+      rasterize_point(floor(intery)+1 , x , color);
     }
     else{
-      render_target[4 * (x + y * target_w)    ] = (uint8_t) (color.r * 255);
-      render_target[4 * (x + y * target_w) + 1] = (uint8_t) (color.g * 255);
-      render_target[4 * (x + y * target_w) + 2] = (uint8_t) (color.b * 255);
-      render_target[4 * (x + y * target_w) + 3] = (uint8_t) (color.a * 255);
+      color.a = rfpart(intery);
+      rasterize_point(x , floor(intery) ,  color);
+      color.a = fpart(intery);
+      rasterize_point(x , floor(intery)+1 ,  color);
     }
-    err += derr;
-    if(err>=0.5){
-      y+=ystep;
-      err-=1.0;
-    }
-
+    intery += gradient;
   }
+
+  // Bersenham algorithm solution
+  // float dx = x1-x0;
+  // float dy = abs(y1-y0);
+  // float err = 0;
+  // float derr = dy/dx;
+  // int ystep;
+
+  // if(y1<y0){ // determines the increasing direction of y
+  //   ystep = -1;
+  // }
+  // else {
+  //   ystep = 1;
+  // }
+
+  // for(int x = x0,y = y0;x<x1;x++){
+  //   if(steep){
+  //     rasterize_point(y,x,color);
+  //   }
+  //   else{
+  //     rasterize_point(x,y,color);
+  //   }
+  //   err += derr;
+  //   if(err>=0.5){
+  //     y+=ystep;
+  //     err-=1.0;
+  //   }
+
+  // }
 
   // TBD: Xiaolin Wu's method
 
 
 }
-
-void SoftwareRendererImp::top_triangle(  float x0, float y0,
-                                        float x1, float y1,
-                                        float x2, float y2,
-                                        Color color ){
-  // if(y2==y1){
-
-  // }
-  // else if(y0==y2){
-  //   swap(x1,x1);
-  //   swap(y2,y1);
-  // }
-  // else if(y1==y2){
-  //   swap(x0,x1);
-  //   swap(y0,y1);
-  // }
-  // else{
-  //   cout<< "This is not a top triangle!"<<endl;
-  //   return;
-  // }
-
-  float temp;
-  if(x1<x0){
-    temp = x1;
-    x1 = x0;
-    x0 = temp;
-    temp = y1;
-    y1 = y0;
-    y0 = temp;
-    // swap(y1,y0);
-  }
-
-
-
-  float d_left;
-  if((int)y2-(int)y0 ==0){
-    d_left = 0;
-  }
-  else{
-    d_left = (x2 - x0)/(y2-y0);
-  }
-    
-  float d_right;
-  if((int)y1-(int)y2 ==0){
-    d_right = 0;
-  }
-  else{
-    d_right = (x2-x1)/(y2-y1);
-  }
-  cout<< "A top triangle:"<<endl;
-  cout<<"("<<x0<<", "<<y0<<") ";
-  cout<<"("<<x1<<", "<<y1<<") ";
-  cout<<"("<<x2<<", "<<y2<<") "<<endl;
-  cout<<"d_left = "<<d_left<<"d_right = "<<d_right<<endl;
-
-  float xs = x0, xe = x1 ;
-  for(int y = y0;y<y2;y++){
-    // cout<<"xs = "<<xs<<" ,xe = "<<xe<<" ,y = "<<y<<endl;
-    rasterize_line(xs,y,xe,y,color);
-    xs += d_left;
-    xe += d_right;
-    cout<<"after adding:"<<endl;
-    cout<<"xs = "<<xs<<" ,xe = "<<xe<<" ,y = "<<y<<endl;
-  }
-
-}
-
-
-  void SoftwareRendererImp::bottom_triangle(  float x0, float y0,
-                                            float x1, float y1,
-                                            float x2, float y2,
-                                            Color color ){
-    // if(y2==y1){
-
-    // }
-    // else if(y2==y0){
-    //   swap(x0,x1);
-    //   swap(y0,y1);
-    // }
-    // else if(y0==y1){
-    //   swap(x0,x2);
-    //   swap(y0,y2);
-    // }
-    // else{
-    // cout<< "This is not a bottom triangle!"<<endl;
-    // return;      
-    // }  
-
-    float temp;
-    if(x1<x2){
-      temp = x1;
-      x1 = x2;
-      x2 = temp;
-      temp = y1;
-      y1 = y2;
-      y2 = temp;
-    }
-
-    float d_left;
-    if((int)y2-(int)y0 ==0){
-      d_left = 0;
-    }
-    else{
-      d_left =(x2-x0)/(y2-y0);
-    }
-
-    float d_right;
-    if((int)y1-(int)y0 ==0){
-      d_right = 0;
-    } 
-    else{
-      d_right = (x1-x0)/(y1-y0);
-    }
-    
-
-    cout<< "A bottom triangle:"<<endl;
-    cout<<"("<<x0<<", "<<y0<<") ";
-    cout<<"("<<x1<<", "<<y1<<") ";
-    cout<<"("<<x2<<", "<<y2<<") "<<endl;
-    cout<<"d_left = "<<d_left<<" ,d_right = "<<d_right<<endl;
-
-    float xs = x0, xe = x0 ;
-
-    for(int y = y0;y<=y2;y++){
-      rasterize_line(xs,y,xe,y,color);
-
-      xs += d_left;
-      xe += d_right;
-      cout<<"after adding:"<<endl;
-      cout<<"xs = "<<xs<<" ,xe = "<<xe<<" ,y = "<<y<<endl;  
-  }
-
-}
-
-
-
 
 void SoftwareRendererImp::rasterize_triangle( float x0, float y0,
                                               float x1, float y1,
@@ -510,41 +461,42 @@ void SoftwareRendererImp::rasterize_triangle( float x0, float y0,
     return;
   }
 
-  // if(y0>y1){
-  //   swap(x0,x1);
-  //   swap(y0,y1);
-  // }
-  // if(y0>y2){
-  //   swap(x0,x2);
-  //   swap(y0,y2);
-  // }
-  // if(y1>y2){
-  //   swap(x1,x2);
-  //   swap(y1,y2);
-  // }
-    // cout<<"("<<x0<<", "<<y0<<") ";
-    // cout<<"("<<x1<<", "<<y1<<") ";
-    // cout<<"("<<x2<<", "<<y2<<") "<<endl;
+  /* Another Method
+    if(y0>y1){
+      swap(x0,x1);
+      swap(y0,y1);
+    }
+    if(y0>y2){
+      swap(x0,x2);
+      swap(y0,y2);
+    }
+    if(y1>y2){
+      swap(x1,x2);
+      swap(y1,y2);
+    }
+      cout<<"("<<x0<<", "<<y0<<") ";
+      cout<<"("<<x1<<", "<<y1<<") ";
+      cout<<"("<<x2<<", "<<y2<<") "<<endl;
 
-  // if(y0==y1){
-  //   top_triangle(x0,y0,x1,y1,x2,y2,color);
-  // }
-  // else if(y1 == y2){
-  //   bottom_triangle(x0,y0,x1,y1,x2,y2,color);
-  // }
-  // else{
-  //   float nx;
-  //   if((int)y2-(int)y0==0){
-  //     nx = x0;
-  //   }
-  //   else{
-  //     nx = x0+(y1-y0)*(x2-x0)/(y2-y0);
-  //   }
-  //   cout<<"new x:"<<"("<<nx<<", "<<y1<<") "<<endl;
-  //   top_triangle(nx,y1,x1,y1,x2,y2,color);
-  //   bottom_triangle(x0,y0,nx,y1,x1,y1,color);
-  // }
-
+    if(y0==y1){
+      top_triangle(x0,y0,x1,y1,x2,y2,color);
+    }
+    else if(y1 == y2){
+      bottom_triangle(x0,y0,x1,y1,x2,y2,color);
+    }
+    else{
+      float nx;
+      if((int)y2-(int)y0==0){
+        nx = x0;
+      }
+      else{
+        nx = x0+(y1-y0)*(x2-x0)/(y2-y0);
+      }
+      cout<<"new x:"<<"("<<nx<<", "<<y1<<") "<<endl;
+      top_triangle(nx,y1,x1,y1,x2,y2,color);
+      bottom_triangle(x0,y0,nx,y1,x1,y1,color);
+    }
+  */
 
   // Rectangle Method
   // CCW triangle
@@ -602,7 +554,7 @@ void SoftwareRendererImp::rasterize_triangle( float x0, float y0,
   // rasterize_line(x2,y2,x0,y0,color);
 
   minX = tripleMin(x0,x1,x2);
-  minY = tripleMin(y0,y1,y2);
+  minY = y0;
 
   maxX = tripleMax(x0,x1,x2);
   maxY = tripleMax(y0,y1,y2);
