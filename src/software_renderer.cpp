@@ -38,10 +38,10 @@ void SoftwareRendererImp::draw_svg( SVG& svg ) {
   Vector2D c = transform(Vector2D(    0    ,svg.height)); c.x--; c.y--;
   Vector2D d = transform(Vector2D(svg.width,svg.height)); d.x++; d.y--;
 
-  rasterize_line(a.x, a.y, b.x, b.y, Color::Black);
-  rasterize_line(a.x, a.y, c.x, c.y, Color::Black);
-  rasterize_line(d.x, d.y, b.x, b.y, Color::Black);
-  rasterize_line(d.x, d.y, c.x, c.y, Color::Black);
+  rasterize_line(a.x, a.y-2, b.x, b.y-2, Color::Black);
+  rasterize_line(a.x, a.y-2, c.x, c.y+2, Color::Black);
+  rasterize_line(d.x, d.y+2, b.x, b.y-2, Color::Black);
+  rasterize_line(d.x, d.y+2, c.x, c.y+2, Color::Black);
 
   // resolve and send to render target
   resolve();
@@ -57,6 +57,8 @@ void SoftwareRendererImp::set_sample_rate( size_t sample_rate ) {
   // You may want to modify this for supersampling support
 
   // set_render_target()
+  // this->supersample_target = (unsigned char*)malloc(4*sample_rate*sample_rate*target_w*target_h);
+  // std::vector<int> supersample_target(4*sample_rate*sample_rate*target_w*target_h,0);
 
   this->sample_rate = sample_rate;
 
@@ -69,7 +71,7 @@ void SoftwareRendererImp::set_render_target( unsigned char* render_target,
   // Task 3: 
   // You may want to modify this for supersampling support
 
-  // this->supersample_target = (unsigned char*)malloc(4*sample_rate*sample_rate*width*height);
+  
 
 
 
@@ -360,60 +362,69 @@ void SoftwareRendererImp::rasterize_line( float x0, float y0,
   float dy = y1-y0;
   float gradient = dy/dx;
 
-  float xend = floor(x0+0.5);
+
+
+  float xend = floor(x0)+0.5;
   float yend = y0 + gradient * (xend-x0);
-  float xgap = rfpart(x0+0.5);
-  int xpxl1 = xend;
-  int ypxl1 = floor(yend);
+  float xgap = rfpart(x0);
+  int xpxl1 = floor(x0);
+  int ypxl1 = floor(yend - 0.5);
+
+  float intery = yend - ypxl1 -0.5;
 
   if(steep){
-    color.a = rfpart(yend*xgap);
+    color.a = rfpart(intery) * xgap;
     rasterize_point(ypxl1,xpxl1,color);
-    color.a = fpart(yend*xgap);
+    color.a = fpart(intery) * xgap;
     rasterize_point(ypxl1+1,xpxl1,color);
   }
   else{
-    color.a = rfpart(yend*xgap);
+    color.a = rfpart(intery) * xgap;
     rasterize_point(xpxl1,ypxl1,color);
-    color.a = fpart(yend*xgap);
+    color.a = fpart(intery) * xgap;
     rasterize_point(xpxl1,ypxl1+1,color);
   }
 
-  float intery = yend + gradient;
+  
 
-  xend = floor(x1+0.5);
+  xend = floor(x1)+0.5;
   yend = y1 + gradient * (xend-x1);
-  xgap = rfpart(x1+0.5);
-  int xpxl2 = xend;
-  int ypxl2 = floor(yend);
+  xgap = fpart(x1);
+  int xpxl2 = floor(x1);
+  int ypxl2 = floor(yend - 0.5);
+
+  intery = yend - ypxl2 -0.5;
 
   if(steep){
-    color.a = rfpart(yend*xgap);
+    color.a = rfpart(intery)*xgap;
     rasterize_point(ypxl2,xpxl2,color);
-    color.a = fpart(yend*xgap);
+    color.a = fpart(intery)*xgap;
     rasterize_point(ypxl2+1,xpxl2,color);
   }
   else{
-    color.a = rfpart(yend*xgap);
+    color.a = rfpart(intery)*xgap;
     rasterize_point(xpxl2,ypxl2,color);
-    color.a = fpart(yend*xgap);
+    color.a = fpart(intery)*xgap;
     rasterize_point(xpxl2,ypxl2+1,color);
   }
 
-  for(int x = xpxl1+1;x<=xpxl2-1;x++){
+  float yline = y0 + (floor(x0)+1+0.5-x0)*gradient;
+  for(int x = floor(x0)+1;x<=floor(x1)-1;x++){
+    intery = yline - floor(yline - 0.5) - 0.5;
+
     if(steep){
       color.a = rfpart(intery);
-      rasterize_point(floor(intery) , x , color);
+      rasterize_point(floor(yline - 0.5) , x , color);
       color.a = fpart(intery);
-      rasterize_point(floor(intery)+1 , x , color);
+      rasterize_point(floor(yline - 0.5)+1 , x , color);
     }
     else{
       color.a = rfpart(intery);
-      rasterize_point(x , floor(intery) ,  color);
+      rasterize_point(x , floor(yline - 0.5) ,  color);
       color.a = fpart(intery);
-      rasterize_point(x , floor(intery)+1 ,  color);
+      rasterize_point(x , floor(yline - 0.5)+1 ,  color);
     }
-    intery += gradient;
+    yline += gradient;
   }
 
   // Bersenham algorithm solution
@@ -460,6 +471,13 @@ void SoftwareRendererImp::rasterize_triangle( float x0, float y0,
     std::cout<< "This is not a triangle!"<<endl;
     return;
   }
+
+  x0 *= sample_rate;
+  x1 *= sample_rate;
+  x2 *= sample_rate;
+  y0 *= sample_rate;
+  y1 *= sample_rate;
+  y2 *= sample_rate;
 
   /* Another Method
     if(y0>y1){
@@ -567,8 +585,8 @@ void SoftwareRendererImp::rasterize_triangle( float x0, float y0,
 
   float e;
 
-  for(x = minX;x<maxX;x++){
-    for(y = minY;y<maxY;y++){
+  for(x = floor(minX)-1;x<=floor(maxX);x++){
+    for(y = floor(minY)-1;y<=floor(maxY);y++){
       for(i = 0;i<3;i++){
         e = dy[i] * (float)x -dx[i] * (float)y + c[i];
         // cout<<"e = "<<e<<endl;
@@ -577,6 +595,11 @@ void SoftwareRendererImp::rasterize_triangle( float x0, float y0,
         }
       } 
       if(i>=3){
+        // supersample_target[4 * (x + y * target_w)    ] = (uint8_t) (color.r * 255);
+        // supersample_target[4 * (x + y * target_w) + 1] = (uint8_t) (color.g * 255);
+        // supersample_target[4 * (x + y * target_w) + 2] = (uint8_t) (color.b * 255);
+        // supersample_target[4 * (x + y * target_w) + 3] = (uint8_t) (color.a * 255);
+        
         render_target[4 * (x + y * target_w)    ] = (uint8_t) (color.r * 255);
         render_target[4 * (x + y * target_w) + 1] = (uint8_t) (color.g * 255);
         render_target[4 * (x + y * target_w) + 2] = (uint8_t) (color.b * 255);
@@ -594,7 +617,7 @@ void SoftwareRendererImp::rasterize_triangle( float x0, float y0,
 void SoftwareRendererImp::rasterize_image( float x0, float y0,
                                            float x1, float y1,
                                            Texture& tex ) {
-  // Task ?: 
+  // Task 5: 
   // Implement image rasterization
 
 }
@@ -605,8 +628,23 @@ void SoftwareRendererImp::resolve( void ) {
   // Task 3: 
   // Implement supersampling
   // You may also need to modify other functions marked with "Task 3".
+  // int rt_size = 4*target_w*target_h;
+  // unsigned char temp; 
 
+  // for(int x=0;x<target_w;x++){
+  //   for(int y=0;y<target_h;y++){
+  //     temp = supersample_target[4 * (x*sample_rate + y*sample_rate * target_w)];
+  //     temp += supersample_target[4 * ((x+1)*sample_rate + y*sample_rate * target_w)];
+  //     temp += supersample_target[4 * (x*sample_rate + (y+1)*sample_rate * target_w)];
+  //     temp += supersample_target[4 * (x*sample_rate + (y+1)*sample_rate * target_w)];
+  //     temp /=4;
+  //     render_target[4 * (x + y * target_w)] = (uint8_t)temp;
+  //   }
+
+  // }
   
+  // SoftwareRendererImp::set_render_target(supersample_target,target_w,target_h);
+  // this->supersample_target.clear();
 
 
   return;

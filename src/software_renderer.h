@@ -140,7 +140,8 @@ class SoftwareRendererImp : public SoftwareRenderer {
   void resolve( void );
 
   // Supersample render target memory location
-  unsigned char* supersample_target; 
+  unsigned char* supersample_target;
+  // std::vector<unsigned char> supersample_target; 
 
 }; // class SoftwareRendererImp
 
