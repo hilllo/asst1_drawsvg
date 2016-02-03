@@ -26,7 +26,7 @@ class SoftwareRenderer : public SVGRenderer {
 
   // Set sample rate
   virtual void set_sample_rate( size_t sample_rate ) = 0;
-  
+
   // Set render target
   virtual void set_render_target( unsigned char* render_target,
                                   size_t width, size_t height ) = 0;
@@ -52,7 +52,7 @@ class SoftwareRenderer : public SVGRenderer {
   size_t sample_rate;
 
   // Render target memory location
-  unsigned char* render_target; 
+  unsigned char* render_target;
 
   // Target buffer dimension (in pixels)
   size_t target_w; size_t target_h;
@@ -76,10 +76,17 @@ class SoftwareRendererImp : public SoftwareRenderer {
 
   // set sample rate
   void set_sample_rate( size_t sample_rate );
-  
+
   // set render target
   void set_render_target( unsigned char* target_buffer,
                           size_t width, size_t height );
+
+  // clear sample target_buffer
+  inline void clear_sample(){
+    sample_buffer.clear();
+    sample_buffer.resize(4 * sample_rate * sample_rate * target_w * target_h);
+    memset(&sample_buffer[0],255,4 * sample_rate * sample_rate * target_w * target_h);
+  }
 
  private:
 
@@ -140,7 +147,11 @@ class SoftwareRendererImp : public SoftwareRenderer {
   void resolve( void );
 
   // Supersample render target memory location
-  unsigned char* supersample_target; 
+  // unsigned char* supersample_target;
+  std::vector<unsigned char> sample_buffer; int w; int h;
+  void fill_sample( int sx, int sy, const Color& c );
+  void fill_pixel( int x, int y, const Color& c );
+
 
 }; // class SoftwareRendererImp
 
@@ -155,7 +166,7 @@ class SoftwareRendererRef : public SoftwareRenderer {
 
   // set sample rate
   void set_sample_rate( size_t sample_rate );
-  
+
   // set render target
   void set_render_target( unsigned char* target_buffer,
                           size_t width, size_t height );

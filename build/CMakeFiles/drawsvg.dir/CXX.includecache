@@ -164,6 +164,7 @@ chrono
 glfw.h
 /home/hilllo/GitHub/asst1_drawsvg/include/glfw.h
 
+<<<<<<< HEAD
 /home/hilllo/GitHub/asst1_drawsvg/src/drawsvg.cpp
 drawsvg.h
 /home/hilllo/GitHub/asst1_drawsvg/src/drawsvg.h
@@ -228,6 +229,8 @@ vector2D.h
 tinyxml2.h
 /home/hilllo/GitHub/asst1_drawsvg/src/tinyxml2.h
 
+=======
+>>>>>>> develop
 /home/hilllo/GitHub/asst1_drawsvg/src/software_renderer.cpp
 software_renderer.h
 /home/hilllo/GitHub/asst1_drawsvg/src/software_renderer.h
@@ -254,6 +257,7 @@ texture.h
 svg_renderer.h
 /home/hilllo/GitHub/asst1_drawsvg/src/svg_renderer.h
 
+<<<<<<< HEAD
 /home/hilllo/GitHub/asst1_drawsvg/src/svg.cpp
 svg.h
 /home/hilllo/GitHub/asst1_drawsvg/src/svg.h
@@ -272,6 +276,8 @@ iostream
 algorithm
 -
 
+=======
+>>>>>>> develop
 /home/hilllo/GitHub/asst1_drawsvg/src/svg.h
 map
 -
@@ -291,6 +297,7 @@ tinyxml2.h
 /home/hilllo/GitHub/asst1_drawsvg/src/svg_renderer.h
 stdio.h
 -
+<<<<<<< HEAD
 CMU462.h
 /home/hilllo/GitHub/asst1_drawsvg/src/CMU462.h
 svg.h
@@ -325,14 +332,24 @@ svg.h
 /home/hilllo/GitHub/asst1_drawsvg/src/svg.h
 
 /home/hilllo/GitHub/asst1_drawsvg/src/viewport.cpp
-viewport.h
-/home/hilllo/GitHub/asst1_drawsvg/src/viewport.h
-stdio.h
--
-iostream
--
+=======
 CMU462.h
 /home/hilllo/GitHub/asst1_drawsvg/src/CMU462.h
+svg.h
+/home/hilllo/GitHub/asst1_drawsvg/src/svg.h
+>>>>>>> develop
+viewport.h
+/home/hilllo/GitHub/asst1_drawsvg/src/viewport.h
+iostream
+-
+
+/home/hilllo/GitHub/asst1_drawsvg/src/texture.h
+CMU462.h
+/home/hilllo/GitHub/asst1_drawsvg/src/CMU462.h
+
+/home/hilllo/GitHub/asst1_drawsvg/src/triangulation.h
+svg.h
+/home/hilllo/GitHub/asst1_drawsvg/src/svg.h
 
 /home/hilllo/GitHub/asst1_drawsvg/src/viewport.h
 CMU462.h
