@@ -201,7 +201,7 @@ GLEW_LIBRARY_DIRS:PATH=/home/hilllo/GitHub/asst1_drawsvg/lib
 GLFW_INCLUDE_DIRS:PATH=/home/hilllo/GitHub/asst1_drawsvg/include/GLFW
 
 //GLFW library
-GLFW_LIBRARIES:FILEPATH=/usr/lib/libglfw.a
+GLFW_LIBRARIES:FILEPATH=/home/hilllo/GitHub/asst1_drawsvg/lib/libglfw.a
 
 //462 include directories
 GLFW_LIBRARY_DIRS:PATH=/home/hilllo/GitHub/asst1_drawsvg/lib
@@ -228,16 +228,16 @@ Project1_BINARY_DIR:STATIC=/home/hilllo/GitHub/asst1_drawsvg/build
 Project1_SOURCE_DIR:STATIC=/home/hilllo/GitHub/asst1_drawsvg/src
 
 //Path to a file.
-X11_ICE_INCLUDE_PATH:PATH=X11_ICE_INCLUDE_PATH-NOTFOUND
+X11_ICE_INCLUDE_PATH:PATH=/usr/include
 
 //Path to a library.
-X11_ICE_LIB:FILEPATH=X11_ICE_LIB-NOTFOUND
+X11_ICE_LIB:FILEPATH=/usr/lib/x86_64-linux-gnu/libICE.so
 
 //Path to a file.
-X11_SM_INCLUDE_PATH:PATH=X11_SM_INCLUDE_PATH-NOTFOUND
+X11_SM_INCLUDE_PATH:PATH=/usr/include
 
 //Path to a library.
-X11_SM_LIB:FILEPATH=X11_SM_LIB-NOTFOUND
+X11_SM_LIB:FILEPATH=/usr/lib/x86_64-linux-gnu/libSM.so
 
 //Path to a file.
 X11_X11_INCLUDE_PATH:PATH=/usr/include
@@ -282,10 +282,10 @@ X11_Xcomposite_INCLUDE_PATH:PATH=X11_Xcomposite_INCLUDE_PATH-NOTFOUND
 X11_Xcomposite_LIB:FILEPATH=X11_Xcomposite_LIB-NOTFOUND
 
 //Path to a file.
-X11_Xcursor_INCLUDE_PATH:PATH=/usr/include
+X11_Xcursor_INCLUDE_PATH:PATH=X11_Xcursor_INCLUDE_PATH-NOTFOUND
 
 //Path to a library.
-X11_Xcursor_LIB:FILEPATH=/usr/lib/x86_64-linux-gnu/libXcursor.so
+X11_Xcursor_LIB:FILEPATH=X11_Xcursor_LIB-NOTFOUND
 
 //Path to a file.
 X11_Xdamage_INCLUDE_PATH:PATH=/usr/include
@@ -315,22 +315,22 @@ X11_Xft_INCLUDE_PATH:PATH=X11_Xft_INCLUDE_PATH-NOTFOUND
 X11_Xft_LIB:FILEPATH=X11_Xft_LIB-NOTFOUND
 
 //Path to a file.
-X11_Xi_INCLUDE_PATH:PATH=/usr/include
+X11_Xi_INCLUDE_PATH:PATH=X11_Xi_INCLUDE_PATH-NOTFOUND
 
 //Path to a library.
-X11_Xi_LIB:FILEPATH=/usr/lib/x86_64-linux-gnu/libXi.so
+X11_Xi_LIB:FILEPATH=X11_Xi_LIB-NOTFOUND
 
 //Path to a file.
-X11_Xinerama_INCLUDE_PATH:PATH=/usr/include
+X11_Xinerama_INCLUDE_PATH:PATH=X11_Xinerama_INCLUDE_PATH-NOTFOUND
 
 //Path to a library.
-X11_Xinerama_LIB:FILEPATH=/usr/lib/x86_64-linux-gnu/libXinerama.so
+X11_Xinerama_LIB:FILEPATH=X11_Xinerama_LIB-NOTFOUND
 
 //Path to a file.
-X11_Xinput_INCLUDE_PATH:PATH=/usr/include
+X11_Xinput_INCLUDE_PATH:PATH=X11_Xinput_INCLUDE_PATH-NOTFOUND
 
 //Path to a library.
-X11_Xinput_LIB:FILEPATH=/usr/lib/x86_64-linux-gnu/libXi.so
+X11_Xinput_LIB:FILEPATH=X11_Xinput_LIB-NOTFOUND
 
 //Path to a file.
 X11_Xkb_INCLUDE_PATH:PATH=/usr/include
@@ -360,16 +360,16 @@ X11_Xpm_INCLUDE_PATH:PATH=X11_Xpm_INCLUDE_PATH-NOTFOUND
 X11_Xpm_LIB:FILEPATH=X11_Xpm_LIB-NOTFOUND
 
 //Path to a file.
-X11_Xrandr_INCLUDE_PATH:PATH=/usr/include
+X11_Xrandr_INCLUDE_PATH:PATH=X11_Xrandr_INCLUDE_PATH-NOTFOUND
 
 //Path to a library.
-X11_Xrandr_LIB:FILEPATH=/usr/lib/x86_64-linux-gnu/libXrandr.so
+X11_Xrandr_LIB:FILEPATH=X11_Xrandr_LIB-NOTFOUND
 
 //Path to a file.
-X11_Xrender_INCLUDE_PATH:PATH=/usr/include
+X11_Xrender_INCLUDE_PATH:PATH=X11_Xrender_INCLUDE_PATH-NOTFOUND
 
 //Path to a library.
-X11_Xrender_LIB:FILEPATH=/usr/lib/x86_64-linux-gnu/libXrender.so
+X11_Xrender_LIB:FILEPATH=X11_Xrender_LIB-NOTFOUND
 
 //Path to a file.
 X11_Xscreensaver_INCLUDE_PATH:PATH=X11_Xscreensaver_INCLUDE_PATH-NOTFOUND
@@ -381,10 +381,10 @@ X11_Xscreensaver_LIB:FILEPATH=X11_Xscreensaver_LIB-NOTFOUND
 X11_Xshape_INCLUDE_PATH:PATH=/usr/include
 
 //Path to a file.
-X11_Xt_INCLUDE_PATH:PATH=X11_Xt_INCLUDE_PATH-NOTFOUND
+X11_Xt_INCLUDE_PATH:PATH=/usr/include
 
 //Path to a library.
-X11_Xt_LIB:FILEPATH=X11_Xt_LIB-NOTFOUND
+X11_Xt_LIB:FILEPATH=/usr/lib/x86_64-linux-gnu/libXt.so
 
 //Path to a file.
 X11_Xutil_INCLUDE_PATH:PATH=/usr/include
@@ -492,6 +492,8 @@ CMAKE_HAVE_SHMAT:INTERNAL=1
 CMAKE_HOME_DIRECTORY:INTERNAL=/home/hilllo/GitHub/asst1_drawsvg/src
 //Install .so files without execute permission.
 CMAKE_INSTALL_SO_NO_EXE:INTERNAL=1
+//Have library ICE
+CMAKE_LIB_ICE_HAS_ICECONNECTIONNUMBER:INTERNAL=1
 //ADVANCED property for variable: CMAKE_LINKER
 CMAKE_LINKER-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_MAKE_PROGRAM
@@ -557,7 +559,7 @@ FIND_PACKAGE_MESSAGE_DETAILS_Freetype:INTERNAL=[/usr/lib/x86_64-linux-gnu/libfre
 //Details about finding GLEW
 FIND_PACKAGE_MESSAGE_DETAILS_GLEW:INTERNAL=[/home/hilllo/GitHub/asst1_drawsvg/lib/libglew.a][/home/hilllo/GitHub/asst1_drawsvg/include/GLEW][/home/hilllo/GitHub/asst1_drawsvg/lib][v1.13.0()]
 //Details about finding GLFW
-FIND_PACKAGE_MESSAGE_DETAILS_GLFW:INTERNAL=[/usr/lib/libglfw.a][/home/hilllo/GitHub/asst1_drawsvg/include/GLFW][/home/hilllo/GitHub/asst1_drawsvg/lib][v3.1.1()]
+FIND_PACKAGE_MESSAGE_DETAILS_GLFW:INTERNAL=[/home/hilllo/GitHub/asst1_drawsvg/lib/libglfw.a][/home/hilllo/GitHub/asst1_drawsvg/include/GLFW][/home/hilllo/GitHub/asst1_drawsvg/lib][v3.1.1()]
 //Details about finding OpenGL
 FIND_PACKAGE_MESSAGE_DETAILS_OpenGL:INTERNAL=[/usr/lib/x86_64-linux-gnu/libGL.so][/usr/include][v()]
 //Details about finding X11
