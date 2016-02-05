@@ -167,6 +167,7 @@ glfw.h
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 /home/hilllo/GitHub/asst1_drawsvg/src/drawsvg.cpp
 drawsvg.h
 /home/hilllo/GitHub/asst1_drawsvg/src/drawsvg.h
@@ -325,6 +326,8 @@ viewport.h
 iostream
 -
 
+=======
+>>>>>>> develop
 /home/hilllo/GitHub/asst1_drawsvg/src/texture.cpp
 texture.h
 /home/hilllo/GitHub/asst1_drawsvg/src/texture.h
@@ -339,6 +342,7 @@ algorithm
 CMU462.h
 /home/hilllo/GitHub/asst1_drawsvg/src/CMU462.h
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 /home/hilllo/GitHub/asst1_drawsvg/src/triangulation.cpp
 triangulation.h
@@ -379,3 +383,5 @@ CMU462.h
 =======
 >>>>>>> develop
 
+=======
+>>>>>>> develop
