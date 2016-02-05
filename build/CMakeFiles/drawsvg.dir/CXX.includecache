@@ -165,6 +165,7 @@ glfw.h
 /home/hilllo/GitHub/asst1_drawsvg/include/glfw.h
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 /home/hilllo/GitHub/asst1_drawsvg/src/drawsvg.cpp
 drawsvg.h
 /home/hilllo/GitHub/asst1_drawsvg/src/drawsvg.h
@@ -285,18 +286,14 @@ vector
 -
 color.h
 /home/hilllo/GitHub/asst1_drawsvg/src/color.h
+=======
+/home/hilllo/GitHub/asst1_drawsvg/src/texture.cpp
+>>>>>>> develop
 texture.h
 /home/hilllo/GitHub/asst1_drawsvg/src/texture.h
-vector2D.h
-/home/hilllo/GitHub/asst1_drawsvg/src/vector2D.h
-matrix3x3.h
-/home/hilllo/GitHub/asst1_drawsvg/src/matrix3x3.h
-tinyxml2.h
-/home/hilllo/GitHub/asst1_drawsvg/src/tinyxml2.h
-
-/home/hilllo/GitHub/asst1_drawsvg/src/svg_renderer.h
-stdio.h
+assert.h
 -
+<<<<<<< HEAD
 <<<<<<< HEAD
 CMU462.h
 /home/hilllo/GitHub/asst1_drawsvg/src/CMU462.h
@@ -340,20 +337,14 @@ svg.h
 >>>>>>> develop
 viewport.h
 /home/hilllo/GitHub/asst1_drawsvg/src/viewport.h
+=======
+>>>>>>> develop
 iostream
+-
+algorithm
 -
 
 /home/hilllo/GitHub/asst1_drawsvg/src/texture.h
 CMU462.h
 /home/hilllo/GitHub/asst1_drawsvg/src/CMU462.h
-
-/home/hilllo/GitHub/asst1_drawsvg/src/triangulation.h
-svg.h
-/home/hilllo/GitHub/asst1_drawsvg/src/svg.h
-
-/home/hilllo/GitHub/asst1_drawsvg/src/viewport.h
-CMU462.h
-/home/hilllo/GitHub/asst1_drawsvg/src/CMU462.h
-svg.h
-/home/hilllo/GitHub/asst1_drawsvg/src/svg.h
 
