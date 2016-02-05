@@ -530,13 +530,7 @@ void SoftwareRendererImp::rasterize_triangle( float x0, float y0,
         }
       }
       if(i>=3){
-
         fill_sample(x,y,color);
-        // supersample_target[4 * (x + y * target_w)    ] = (uint8_t) (color.r * 255);
-        // supersample_target[4 * (x + y * target_w) + 1] = (uint8_t) (color.g * 255);
-        // supersample_target[4 * (x + y * target_w) + 2] = (uint8_t) (color.b * 255);
-        // supersample_target[4 * (x + y * target_w) + 3] = (uint8_t) (color.a * 255);
-
         // render_target[4 * (x + y * target_w)    ] = (uint8_t) (color.r * 255);
         // render_target[4 * (x + y * target_w) + 1] = (uint8_t) (color.g * 255);
         // render_target[4 * (x + y * target_w) + 2] = (uint8_t) (color.b * 255);
@@ -556,6 +550,26 @@ void SoftwareRendererImp::rasterize_image( float x0, float y0,
                                            Texture& tex ) {
   // Task 5:
   // Implement image rasterization
+  Matrix3x3 m;
+  m.zero();
+  m(0,0) = (double)1/(x1-x0);
+  m(0,2) = (double)x0/(x0-x1);
+  m(1,1) = (double)1/(y1-y0);
+  m(1,2) = (double)y0/(y0-y1);
+  m(2,2) = 1.0;
+
+  Vector3D dst;
+  Color c;
+  for(int x=x0;x<=x1;++x){
+    for(int y=y0;y<=y1;++y){
+       Vector3D src(x,y,1);
+       dst = m*src;
+      //  c = sampler->sample_nearest(tex,dst.x,dst.y,0);
+       c = sampler->sample_bilinear(tex,dst.x,dst.y,0);
+       fill_sample(x,y,c);
+    }
+  }
+
 
 }
 
@@ -589,10 +603,6 @@ void SoftwareRendererImp::resolve( void ) {
           }
       }
     }
-
-
-
-
 
   memset(&sample_buffer[0], 255, 4 * sample_rate * sample_rate * target_h * target_w);
   return;
