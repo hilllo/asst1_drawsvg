@@ -91,8 +91,8 @@ Color Sampler2DImp::sample_nearest(Texture& tex,
   int height = tex.mipmap[level].height;
   u *=  width - 0.5;
   v *= height - 0.5;
-  int x = floor(u+0.5);
-  int y = floor(v+0.5);
+  int x = floor(u);
+  int y = floor(v);
 
   Color result;
   result.r = (float)(tex.mipmap[level].texels[4*(x + y*width)  ])/255;
