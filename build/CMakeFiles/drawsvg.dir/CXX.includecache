@@ -166,6 +166,7 @@ glfw.h
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 /home/hilllo/GitHub/asst1_drawsvg/src/drawsvg.cpp
 drawsvg.h
 /home/hilllo/GitHub/asst1_drawsvg/src/drawsvg.h
@@ -232,6 +233,8 @@ tinyxml2.h
 
 =======
 >>>>>>> develop
+=======
+>>>>>>> develop
 /home/hilllo/GitHub/asst1_drawsvg/src/software_renderer.cpp
 software_renderer.h
 /home/hilllo/GitHub/asst1_drawsvg/src/software_renderer.h
@@ -259,6 +262,7 @@ svg_renderer.h
 /home/hilllo/GitHub/asst1_drawsvg/src/svg_renderer.h
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 /home/hilllo/GitHub/asst1_drawsvg/src/svg.cpp
 svg.h
 /home/hilllo/GitHub/asst1_drawsvg/src/svg.h
@@ -279,6 +283,8 @@ algorithm
 
 =======
 >>>>>>> develop
+=======
+>>>>>>> develop
 /home/hilllo/GitHub/asst1_drawsvg/src/svg.h
 map
 -
@@ -286,6 +292,7 @@ vector
 -
 color.h
 /home/hilllo/GitHub/asst1_drawsvg/src/color.h
+<<<<<<< HEAD
 =======
 /home/hilllo/GitHub/asst1_drawsvg/src/texture.cpp
 >>>>>>> develop
@@ -295,6 +302,20 @@ assert.h
 -
 <<<<<<< HEAD
 <<<<<<< HEAD
+=======
+texture.h
+/home/hilllo/GitHub/asst1_drawsvg/src/texture.h
+vector2D.h
+/home/hilllo/GitHub/asst1_drawsvg/src/vector2D.h
+matrix3x3.h
+/home/hilllo/GitHub/asst1_drawsvg/src/matrix3x3.h
+tinyxml2.h
+/home/hilllo/GitHub/asst1_drawsvg/src/tinyxml2.h
+
+/home/hilllo/GitHub/asst1_drawsvg/src/svg_renderer.h
+stdio.h
+-
+>>>>>>> develop
 CMU462.h
 /home/hilllo/GitHub/asst1_drawsvg/src/CMU462.h
 svg.h
@@ -318,22 +339,30 @@ algorithm
 CMU462.h
 /home/hilllo/GitHub/asst1_drawsvg/src/CMU462.h
 
+<<<<<<< HEAD
 /home/hilllo/GitHub/asst1_drawsvg/src/triangulation.cpp
 triangulation.h
 /home/hilllo/GitHub/asst1_drawsvg/src/triangulation.h
 vector
 -
 
+=======
+>>>>>>> develop
 /home/hilllo/GitHub/asst1_drawsvg/src/triangulation.h
 svg.h
 /home/hilllo/GitHub/asst1_drawsvg/src/svg.h
 
+<<<<<<< HEAD
 /home/hilllo/GitHub/asst1_drawsvg/src/viewport.cpp
 =======
+=======
+/home/hilllo/GitHub/asst1_drawsvg/src/viewport.h
+>>>>>>> develop
 CMU462.h
 /home/hilllo/GitHub/asst1_drawsvg/src/CMU462.h
 svg.h
 /home/hilllo/GitHub/asst1_drawsvg/src/svg.h
+<<<<<<< HEAD
 >>>>>>> develop
 viewport.h
 /home/hilllo/GitHub/asst1_drawsvg/src/viewport.h
@@ -347,4 +376,6 @@ algorithm
 /home/hilllo/GitHub/asst1_drawsvg/src/texture.h
 CMU462.h
 /home/hilllo/GitHub/asst1_drawsvg/src/CMU462.h
+=======
+>>>>>>> develop
 
