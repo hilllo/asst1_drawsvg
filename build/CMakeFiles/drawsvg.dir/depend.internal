@@ -21,7 +21,10 @@ CMakeFiles/drawsvg.dir/drawsvg.cpp.o
  /home/hilllo/GitHub/asst1_drawsvg/src/software_renderer.h
  /home/hilllo/GitHub/asst1_drawsvg/src/svg.h
  /home/hilllo/GitHub/asst1_drawsvg/src/svg_renderer.h
+ /home/hilllo/GitHub/asst1_drawsvg/src/texture.cpp
  /home/hilllo/GitHub/asst1_drawsvg/src/texture.h
+ /home/hilllo/GitHub/asst1_drawsvg/src/triangulation.cpp
+ /home/hilllo/GitHub/asst1_drawsvg/src/triangulation.h
  /home/hilllo/GitHub/asst1_drawsvg/src/viewport.h
 CMakeFiles/drawsvg.dir/main.cpp.o
  /home/hilllo/GitHub/asst1_drawsvg/include/CMU462.h
@@ -43,7 +46,10 @@ CMakeFiles/drawsvg.dir/main.cpp.o
  /home/hilllo/GitHub/asst1_drawsvg/src/software_renderer.h
  /home/hilllo/GitHub/asst1_drawsvg/src/svg.h
  /home/hilllo/GitHub/asst1_drawsvg/src/svg_renderer.h
+ /home/hilllo/GitHub/asst1_drawsvg/src/texture.cpp
  /home/hilllo/GitHub/asst1_drawsvg/src/texture.h
+ /home/hilllo/GitHub/asst1_drawsvg/src/triangulation.cpp
+ /home/hilllo/GitHub/asst1_drawsvg/src/triangulation.h
  /home/hilllo/GitHub/asst1_drawsvg/src/viewport.h
 CMakeFiles/drawsvg.dir/png.cpp.o
  /home/hilllo/GitHub/asst1_drawsvg/include/color.h

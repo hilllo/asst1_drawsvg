@@ -77,11 +77,18 @@ void Sampler2DImp::generate_mips(Texture& tex, int startLevel) {
 
   // fill all levels
   // method as supersampling
+  // std::cout<<"levels = "<<tex.mipmap.size()<<endl;
+
   unsigned char temp[4];
   int k;
-  int last_width;
+  int last_width,this_width;
   for(size_t l = 1; l < tex.mipmap.size(); ++l) { //level
     last_width = tex.mipmap[l-1].width;
+    this_width = tex.mipmap[l].width;
+
+    // std::cout<<"l = "<<l;
+    // std::cout<<", last width = "<<last_width;
+    // std::cout<<", this width = "<<this_width<<endl;
 
     for(int x = 0;x<tex.mipmap[l].width;x++){ //pixel
       for(int y = 0;y<tex.mipmap[l].height;y++){
@@ -90,23 +97,25 @@ void Sampler2DImp::generate_mips(Texture& tex, int startLevel) {
           temp[k] = 0;
         }
 
-
-          for(int i=0;i<2;i++){
-            for(int j=0;j<2;j++){
-              for(int k=0;i<4;k++){
-                temp[k] += tex.mipmap[l-1].texels[4*((x*2+i) + (y*2+j)*last_width)+k];
-              }
-
+        // for(k=0;k<4;k++){
+        //   // temp[k] += tex.mipmap[l-1].texels[4*((x*2) + (y*2)*last_width)+k];
+        //   temp[k] += tex.mipmap[l-1].texels[4*((x*2) + (y*2+1)*last_width)+k];
+        // }
+        for(int i=0;i<2;i++){
+          for(int j=0;j<2;j++){
+            for(k=0;k<4;k++){
+              temp[k] += tex.mipmap[l-1].texels[4*((x*2+i) + (y*2+j)*last_width)+k];
             }
           }
+        }
 
-
+        for(k = 0;k<4;k++){
+          temp[k] /= 4;
+          tex.mipmap[l].texels[4*(x + y*this_width)+k] = temp[k];
+        }
       }
     }
-
-
   }
-
 
 }
 
@@ -190,25 +199,44 @@ Color Sampler2DImp::sample_trilinear(Texture& tex,
 
   // return magenta for invalid level
   // return Color(1,0,1,1);
-  int level;
-  float scale;
-  Color color;
-  if( u_scale >= 1 || v_scale >= 1 )
-      color = sample_bilinear(tex, u, v, 0);
-  else
-  {
-      if( u_scale >= v_scale )
-          scale = u_scale;
-      else scale = v_scale;
-      level = log2( 1 / scale );
-      if( level > tex.mipmap.size() )
-          return Color(1,0,1,1);
-      color.r = log2( 1 / scale ) * sample_bilinear(tex, u, v, level).r + ( 1 - log2( 1 / scale ) ) * sample_bilinear(tex, u, v, level + 1).r;
-      color.g = log2( 1 / scale ) * sample_bilinear(tex, u, v, level).g + ( 1 - log2( 1 / scale ) ) * sample_bilinear(tex, u, v, level + 1).g;
-      color.b = log2( 1 / scale ) * sample_bilinear(tex, u, v, level).b + ( 1 - log2( 1 / scale ) ) * sample_bilinear(tex, u, v, level + 1).b;
-      color.a = log2( 1 / scale ) * sample_bilinear(tex, u, v, level).a + ( 1 - log2( 1 / scale ) ) * sample_bilinear(tex, u, v, level + 1).a;
+  Color result;
+  if(u_scale>tex.mipmap[0].width||v_scale>tex.mipmap[0].height){
+    result = sample_bilinear(tex,u,v,0);
+    return result;
+    // return Color(1,0,1,1);
   }
-  return color;
+
+  int upper_level,lower_level;
+  float max_scale;
+
+  if(u_scale>v_scale){
+    max_scale = u_scale;
+  }
+  else{
+    max_scale = v_scale;
+  }
+
+  float src_level = log2(max_scale);
+  src_level = (float)(tex.mipmap.size())-src_level-1.0;
+
+  upper_level = ceil(src_level);
+  lower_level = upper_level-1; //floor(src_level);
+
+  // std::cout<<src_level<<" "<<upper_level<<" "<<lower_level<<endl;
+
+  float ul_weight = src_level - lower_level;
+  float ll_weight = 1-ul_weight; //src_level - upper_level;
+
+  Color ulc = sample_bilinear(tex,u,v,upper_level);
+  Color llc = sample_bilinear(tex,u,v,lower_level);
+
+  result.r = ulc.r * ul_weight + llc.r * ll_weight;
+  result.g = ulc.g * ul_weight + llc.g * ll_weight;
+  result.b = ulc.b * ul_weight + llc.b * ll_weight;
+  result.a = ulc.a * ul_weight + llc.a * ll_weight;
+
+
+  return result;
 }
 
 } // namespace CMU462

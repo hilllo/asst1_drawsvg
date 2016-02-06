@@ -88,6 +88,12 @@ class SoftwareRendererImp : public SoftwareRenderer {
     memset(&sample_buffer[0],255,4 * sample_rate * sample_rate * target_w * target_h);
   }
 
+  inline void clear_point(){
+    point_buffer.clear();
+    point_buffer.resize(4 * target_w * target_h);
+    memset(&point_buffer[0],255,4 * target_w * target_h);
+  }
+
  private:
 
   // Primitive Drawing //
@@ -150,6 +156,7 @@ class SoftwareRendererImp : public SoftwareRenderer {
   // unsigned char* supersample_target;
   std::vector<unsigned char> sample_buffer; int w; int h;
   void fill_sample( int sx, int sy, const Color& c );
+  std::vector<unsigned char> point_buffer;
   void fill_pixel( int x, int y, const Color& c );
 
 

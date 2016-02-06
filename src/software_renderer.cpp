@@ -58,7 +58,7 @@ void SoftwareRendererImp::set_sample_rate( size_t sample_rate ) {
 
   this->sample_rate = sample_rate;
   this->clear_sample();
-
+  this->clear_point();
 
 }
 
@@ -75,6 +75,7 @@ void SoftwareRendererImp::set_render_target( unsigned char* render_target,
   this->target_w = width;
   this->target_h = height;
   this->clear_sample();
+  this->clear_point();
 }
 
 
@@ -123,6 +124,7 @@ void SoftwareRendererImp::draw_element( SVGElement* element ) {
 // Primitive Drawing //
 
 void SoftwareRendererImp::draw_point( Point& point ) {
+
 
   Vector2D p = transform(point.position); //transform the input into its screen-space position
   rasterize_point( p.x, p.y, point.style.fillColor ); //actually drawing the point
@@ -247,15 +249,19 @@ void SoftwareRendererImp::draw_group( Group& group ) {
 void SoftwareRendererImp::rasterize_point( float x, float y, Color color ) {
 
   //fill in the nearest pixel
+
   int sx = (int) floor(x);
   int sy = (int) floor(y);
 
-  // check bounds
-  fill_pixel(sx,sy,color);
-  // render_target[4 * (sx + sy * target_w)    ] = (uint8_t) (color.r * 255);
-  // render_target[4 * (sx + sy * target_w) + 1] = (uint8_t) (color.g * 255);
-  // render_target[4 * (sx + sy * target_w) + 2] = (uint8_t) (color.b * 255);
-  // render_target[4 * (sx + sy * target_w) + 3] = (uint8_t) (color.a * 255);
+  if ( sx < 0 || sx >= target_w ) return;
+  if ( sy < 0 || sy >= target_h ) return;
+
+  // fill_pixel(sx,sy,color);
+
+  point_buffer[4 * (sx + sy * target_w)    ] = (uint8_t) (color.r * 255);
+  point_buffer[4 * (sx + sy * target_w) + 1] = (uint8_t) (color.g * 255);
+  point_buffer[4 * (sx + sy * target_w) + 2] = (uint8_t) (color.b * 255);
+  point_buffer[4 * (sx + sy * target_w) + 3] = (uint8_t) (color.a * 255);
 }
 
 float SoftwareRendererImp::fpart(float x){
@@ -343,7 +349,7 @@ void SoftwareRendererImp::rasterize_line( float x0, float y0,
     fill_sample(xpxl2,ypxl2+1,color);
   }
 
-  float yline = y0 + (floor(x0)+1+0.5-x0)*gradient;
+  float yline = y0 + (floor(x0)+0.5-x0+1)*gradient;
   for(int x = floor(x0)+1;x<=floor(x1)-1;x++){
     intery = yline - floor(yline - 0.5) - 0.5;
 
@@ -390,8 +396,6 @@ void SoftwareRendererImp::rasterize_line( float x0, float y0,
   //   }
 
   // }
-
-  // TBD: Xiaolin Wu's method
 
 
 }
@@ -560,8 +564,8 @@ void SoftwareRendererImp::rasterize_image( float x0, float y0,
 
   float src_width = x1 - x0;
   float src_height = y1 - y0;
-  float u_scale = (float)(tex.width) / src_width;
-  float v_scale = (float)(tex.heigh) / src_height;
+  float u_scale = (float)(tex.mipmap[0].width) / src_width;
+  float v_scale = (float)(tex.mipmap[0].height) / src_height;
 
   Vector3D dst;
   Color c;
@@ -571,7 +575,7 @@ void SoftwareRendererImp::rasterize_image( float x0, float y0,
        dst = m*src;
       //  c = sampler->sample_nearest(tex,dst.x,dst.y,0);
       //  c = sampler->sample_bilinear(tex,dst.x,dst.y,0);
-       c = sampler->sample_trilinear(tex,dst.x,dst.y,u_scale,v_scale);
+       c = sampler->sample_trilinear(tex,dst.x,dst.y,src_width,src_height);
        fill_sample(x,y,c);
     }
   }
@@ -609,9 +613,29 @@ void SoftwareRendererImp::resolve( void ) {
           }
       }
     }
+    memset(&sample_buffer[0], 255, 4 * sample_rate * sample_rate * target_h * target_w);
 
-  memset(&sample_buffer[0], 255, 4 * sample_rate * sample_rate * target_h * target_w);
-  return;
+    Color pointc;
+    for(int x = 0;x<target_w;x++){
+      for(int y=0;y<target_h;y++){
+        for(k = 0;k<3;k++){
+          if(point_buffer[4 * (x + y * target_w)+k]!=255){
+            render_target[4 * (x + y * target_w)+k] = point_buffer[4 * (x + y * target_w)+k];;
+          }
+        }
+        // if(k>=3){
+        //   pointc.r = point_buffer[4 * (x + y * target_w)]/255;
+        //   pointc.g = point_buffer[4 * (x + y * target_w)+1]/255;
+        //   pointc.b = point_buffer[4 * (x + y * target_w)+2]/255;
+        //   pointc.a = point_buffer[4 * (x + y * target_w)+3]/255;
+        //   fill_pixel(x,y,pointc);
+        // }
+
+
+      }
+    }
+    memset(&point_buffer[0], 255, 4 * target_h * target_w);
+    return;
 
 }
 
