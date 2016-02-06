@@ -554,6 +554,11 @@ void SoftwareRendererImp::rasterize_image( float x0, float y0,
                                            Texture& tex ) {
   // Task 5:
   // Implement image rasterization
+  x0 *= sample_rate;
+  x1 *= sample_rate;
+  y0 *= sample_rate;
+  y1 *= sample_rate;
+
   Matrix3x3 m;
   m.zero();
   m(0,0) = (double)1/(x1-x0);
