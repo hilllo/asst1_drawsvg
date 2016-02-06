@@ -558,6 +558,11 @@ void SoftwareRendererImp::rasterize_image( float x0, float y0,
   m(1,2) = (double)y0/(y0-y1);
   m(2,2) = 1.0;
 
+  float src_width = x1 - x0;
+  float src_height = y1 - y0;
+  float u_scale = (float)(tex.width) / src_width;
+  float v_scale = (float)(tex.heigh) / src_height;
+
   Vector3D dst;
   Color c;
   for(int x=x0;x<=x1;++x){
@@ -565,7 +570,8 @@ void SoftwareRendererImp::rasterize_image( float x0, float y0,
        Vector3D src(x,y,1);
        dst = m*src;
       //  c = sampler->sample_nearest(tex,dst.x,dst.y,0);
-       c = sampler->sample_bilinear(tex,dst.x,dst.y,0);
+      //  c = sampler->sample_bilinear(tex,dst.x,dst.y,0);
+       c = sampler->sample_trilinear(tex,dst.x,dst.y,u_scale,v_scale);
        fill_sample(x,y,c);
     }
   }

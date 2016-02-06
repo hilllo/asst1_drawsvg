@@ -64,16 +64,49 @@ void Sampler2DImp::generate_mips(Texture& tex, int startLevel) {
   }
 
   // fill all 0 sub levels with interchanging colors
-  Color colors[3] = { Color(1,0,0,1), Color(0,1,0,1), Color(0,0,1,1) };
-  for(size_t i = 1; i < tex.mipmap.size(); ++i) {
+  // Color colors[3] = { Color(1,0,0,1), Color(0,1,0,1), Color(0,0,1,1) };
+  // for(size_t i = 1; i < tex.mipmap.size(); ++i) {
+  //
+  //   Color c = colors[i % 3];
+  //   MipLevel& mip = tex.mipmap[i];
+  //
+  //   for(size_t i = 0; i < 4 * mip.width * mip.height; i += 4) {
+  //     float_to_uint8( &mip.texels[i], &c.r );
+  //   }
+  // }
 
-    Color c = colors[i % 3];
-    MipLevel& mip = tex.mipmap[i];
+  // fill all levels
+  // method as supersampling
+  unsigned char temp[4];
+  int k;
+  int last_width;
+  for(size_t l = 1; l < tex.mipmap.size(); ++l) { //level
+    last_width = tex.mipmap[l-1].width;
 
-    for(size_t i = 0; i < 4 * mip.width * mip.height; i += 4) {
-      float_to_uint8( &mip.texels[i], &c.r );
+    for(int x = 0;x<tex.mipmap[l].width;x++){ //pixel
+      for(int y = 0;y<tex.mipmap[l].height;y++){
+
+        for(k=0;k<4;k++){
+          temp[k] = 0;
+        }
+
+
+          for(int i=0;i<2;i++){
+            for(int j=0;j<2;j++){
+              for(int k=0;i<4;k++){
+                temp[k] += tex.mipmap[l-1].texels[4*((x*2+i) + (y*2+j)*last_width)+k];
+              }
+
+            }
+          }
+
+
+      }
     }
+
+
   }
+
 
 }
 
@@ -83,6 +116,7 @@ Color Sampler2DImp::sample_nearest(Texture& tex,
 
 
   // Task ?: Implement nearest neighbour interpolation
+  // return magenta for invalid level
   if(level>tex.mipmap.size()){
     return Color(1,0,1,1);
   }
@@ -101,7 +135,7 @@ Color Sampler2DImp::sample_nearest(Texture& tex,
   result.a = (float)(tex.mipmap[level].texels[4*(x + y*width)+3])/255;
 
   return result;
-  // return magenta for invalid level
+
 
 }
 
@@ -110,6 +144,7 @@ Color Sampler2DImp::sample_bilinear(Texture& tex,
                                     int level) {
 
   // Task ?: Implement bilinear filtering
+  // return magenta for invalid level
   if(level>tex.mipmap.size()){
     return Color(1,0,1,1);
   }
@@ -143,7 +178,6 @@ Color Sampler2DImp::sample_bilinear(Texture& tex,
 
 
   return result;
-  // return magenta for invalid level
 
 
 }
@@ -155,8 +189,26 @@ Color Sampler2DImp::sample_trilinear(Texture& tex,
   // Task 8: Implement trilinear filtering
 
   // return magenta for invalid level
-  return Color(1,0,1,1);
-
+  // return Color(1,0,1,1);
+  int level;
+  float scale;
+  Color color;
+  if( u_scale >= 1 || v_scale >= 1 )
+      color = sample_bilinear(tex, u, v, 0);
+  else
+  {
+      if( u_scale >= v_scale )
+          scale = u_scale;
+      else scale = v_scale;
+      level = log2( 1 / scale );
+      if( level > tex.mipmap.size() )
+          return Color(1,0,1,1);
+      color.r = log2( 1 / scale ) * sample_bilinear(tex, u, v, level).r + ( 1 - log2( 1 / scale ) ) * sample_bilinear(tex, u, v, level + 1).r;
+      color.g = log2( 1 / scale ) * sample_bilinear(tex, u, v, level).g + ( 1 - log2( 1 / scale ) ) * sample_bilinear(tex, u, v, level + 1).g;
+      color.b = log2( 1 / scale ) * sample_bilinear(tex, u, v, level).b + ( 1 - log2( 1 / scale ) ) * sample_bilinear(tex, u, v, level + 1).b;
+      color.a = log2( 1 / scale ) * sample_bilinear(tex, u, v, level).a + ( 1 - log2( 1 / scale ) ) * sample_bilinear(tex, u, v, level + 1).a;
+  }
+  return color;
 }
 
 } // namespace CMU462
