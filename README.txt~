@@ -1,6 +1,3 @@
-# Assignment 1: DrawSVG
-<http://462cmu.github.io/asst1_drawsvg/>
-
 Extra credit claim:
 
 Task1:	Impletmented both Bresenham's algorithm and Xiaolin Wu's line algorithm.
